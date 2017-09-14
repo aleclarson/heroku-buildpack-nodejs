@@ -44,12 +44,22 @@ install_nodejs() {
     fail_bin_install node $version;
   fi
 
+  echo "NODE_URL = $url"
+
+  local APP_PATH="/app"
+  if [ -d "$APP_PATH" ]; then
+    echo "$(ls "$APP_PATH" -a)"
+    # echo "Found pre-installed node binary"
+  fi
+
   echo "Downloading and installing node $number..."
   local code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o /tmp/node.tar.gz --write-out "%{http_code}")
   if [ "$code" != "200" ]; then
     echo "Unable to download node: $code" && false
   fi
   tar xzf /tmp/node.tar.gz -C /tmp
+
+  echo "Replacing node directory: $dir"
   rm -rf $dir/*
   mv /tmp/node-v$number-$os-$cpu/* $dir
   chmod +x $dir/bin/*
